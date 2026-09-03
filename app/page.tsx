@@ -87,20 +87,32 @@ export default function Home() {
   const [authChecked, setAuthChecked] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [groupId, setGroupId] = useState("");
   const [places, setPlaces] = useState<Place[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [tripItems, setTripItems] = useState<TripItem[]>([]);
   const [dataError, setDataError] = useState("");
 
-  const loadData = useCallback(async () => {
+  const getPrimaryGroupId = useCallback(async () => {
+    const { data, error } = await supabase.from("travel_group_members").select("group_id").limit(1).single();
+    if (error || !data) return "";
+    return readString(data, "group_id");
+  }, [supabase]);
+
+  const loadData = useCallback(async (targetGroupId: string) => {
+    if (!targetGroupId) {
+      setDataError("找不到共同旅程群組，請先執行 Supabase 共享群組 SQL。");
+      return;
+    }
+
     setIsLoadingData(true);
     setDataError("");
 
     const [placesResult, reviewsResult, tripsResult, tripItemsResult] = await Promise.all([
-      supabase.from("places").select("*").order("created_at", { ascending: false }),
+      supabase.from("places").select("*").eq("group_id", targetGroupId).order("created_at", { ascending: false }),
       supabase.from("place_reviews").select("*"),
-      supabase.from("trips").select("*").order("created_at", { ascending: false }),
-      supabase.from("trip_items").select("*").order("sort_order", { ascending: true }),
+      supabase.from("trips").select("*").eq("group_id", targetGroupId).order("created_at", { ascending: false }),
+      supabase.from("trip_items").select("*").eq("group_id", targetGroupId).order("sort_order", { ascending: true }),
     ]);
 
     const firstError = placesResult.error ?? reviewsResult.error ?? tripsResult.error ?? tripItemsResult.error;
@@ -124,31 +136,44 @@ export default function Home() {
       if (!isMounted) return;
       setUser(data.user);
       setAuthChecked(true);
-      if (data.user) await loadData();
+      if (data.user) {
+        const memberGroupId = await getPrimaryGroupId();
+        if (!isMounted) return;
+        setGroupId(memberGroupId);
+        await loadData(memberGroupId);
+      }
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) void loadData();
+      if (session?.user) {
+        void getPrimaryGroupId().then((memberGroupId) => {
+          setGroupId(memberGroupId);
+          void loadData(memberGroupId);
+        });
+      } else {
+        setGroupId("");
+      }
     });
 
     return () => {
       isMounted = false;
       subscription.unsubscribe();
     };
-  }, [loadData, supabase]);
+  }, [getPrimaryGroupId, loadData, supabase]);
 
   const placesById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
 
   async function addPlace(draft: PlaceDraft) {
-    if (!user) return;
+    if (!user || !groupId) return;
     setDataError("");
     const { data, error } = await supabase
       .from("places")
       .insert({
         user_id: user.id,
+        group_id: groupId,
         name: draft.name,
         category: draft.category,
         city: draft.city,
@@ -197,12 +222,13 @@ export default function Home() {
   }
 
   async function addTrip(trip: Omit<Trip, "id" | "userId" | "createdAt" | "updatedAt">) {
-    if (!user) return;
+    if (!user || !groupId) return;
     setDataError("");
     const { data, error } = await supabase
       .from("trips")
       .insert({
         user_id: user.id,
+        group_id: groupId,
         name: trip.name,
         start_date: trip.startDate,
         end_date: trip.endDate,
@@ -220,13 +246,14 @@ export default function Home() {
   }
 
   async function addTripItem(item: Omit<TripItem, "id" | "sortOrder">) {
-    if (!user) return;
+    if (!user || !groupId) return;
     setDataError("");
     const nextOrder = tripItems.filter((candidate) => candidate.tripId === item.tripId && candidate.dayIndex === item.dayIndex).length;
     const { data, error } = await supabase
       .from("trip_items")
       .insert({
         user_id: user.id,
+        group_id: groupId,
         trip_id: item.tripId,
         day_index: item.dayIndex,
         place_id: item.placeId || null,
@@ -280,6 +307,7 @@ export default function Home() {
   }
 
   async function reorderTripItems(dayItems: TripItem[]) {
+    if (!user || !groupId) return;
     setTripItems((current) => {
       const ids = new Set(dayItems.map((item) => item.id));
       return current.map((item) => {
@@ -291,7 +319,8 @@ export default function Home() {
     const { error } = await supabase.from("trip_items").upsert(
       dayItems.map((item) => ({
         id: item.id,
-        user_id: user?.id,
+        user_id: user.id,
+        group_id: groupId,
         trip_id: item.tripId,
         day_index: item.dayIndex,
         place_id: item.placeId || null,
@@ -311,12 +340,15 @@ export default function Home() {
   async function handleLogin() {
     const { data } = await supabase.auth.getUser();
     setUser(data.user);
-    await loadData();
+    const memberGroupId = await getPrimaryGroupId();
+    setGroupId(memberGroupId);
+    await loadData(memberGroupId);
   }
 
   async function handleLogout() {
     await supabase.auth.signOut();
     setUser(null);
+    setGroupId("");
     setPlaces([]);
     setTrips([]);
     setTripItems([]);
