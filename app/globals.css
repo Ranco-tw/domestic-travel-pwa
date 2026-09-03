@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --background: 247 243 234;
-  --card: 255 253 248;
+  --background: 251 248 241;
+  --card: 255 254 250;
   --primary: 111 125 77;
   --accent: 199 121 74;
   --text: 47 42 36;
   --muted: 117 107 93;
-  --border: 227 216 200;
+  --border: 229 222 211;
   --star: 217 164 65;
 }
 
