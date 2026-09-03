@@ -70,11 +70,46 @@ alter table public.place_reviews enable row level security;
 alter table public.trips enable row level security;
 alter table public.trip_items enable row level security;
 
-create policy "profiles are private" on public.profiles for all using (auth.uid() = id) with check (auth.uid() = id);
-create policy "places are private" on public.places for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "reviews are private" on public.place_reviews for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "trips are private" on public.trips for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "trip items are private" on public.trip_items for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+drop policy if exists "profiles are private" on public.profiles;
+drop policy if exists "places are private" on public.places;
+drop policy if exists "reviews are private" on public.place_reviews;
+drop policy if exists "trips are private" on public.trips;
+drop policy if exists "trip items are private" on public.trip_items;
+
+create policy "profiles are private"
+  on public.profiles
+  for all
+  to authenticated
+  using ((select auth.uid()) = id)
+  with check ((select auth.uid()) = id);
+
+create policy "places are private"
+  on public.places
+  for all
+  to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+
+create policy "reviews are private"
+  on public.place_reviews
+  for all
+  to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+
+create policy "trips are private"
+  on public.trips
+  for all
+  to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+
+create policy "trip items are private"
+  on public.trip_items
+  for all
+  to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
 
 create index if not exists places_user_status_idx on public.places (user_id, status);
 create index if not exists places_user_city_idx on public.places (user_id, city);
