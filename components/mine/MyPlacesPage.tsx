@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AddToTripSheet } from "@/components/itinerary/AddToTripSheet";
 import { CityAccordion } from "@/components/places/CityAccordion";
 import { ReviewSheet } from "@/components/places/ReviewSheet";
 import { categories, groupPlacesByCityAndCategory } from "@/lib/placeUtils";
@@ -11,26 +12,14 @@ interface MyPlacesPageProps {
   trips: Trip[];
   onReview: (placeId: string, review: PlaceReview) => void;
   onAddTripItem: (item: Omit<TripItem, "id" | "sortOrder">) => void;
+  onDeletePlace: (placeId: string) => void;
 }
 
-export function MyPlacesPage({ places, trips, onReview, onAddTripItem }: MyPlacesPageProps) {
+export function MyPlacesPage({ places, trips, onReview, onAddTripItem, onDeletePlace }: MyPlacesPageProps) {
   const [filter, setFilter] = useState<PlaceCategory | "全部">("全部");
   const [reviewing, setReviewing] = useState<Place | null>(null);
+  const [addingToTrip, setAddingToTrip] = useState<Place | null>(null);
   const groups = groupPlacesByCityAndCategory(places, filter);
-
-  function addToTrip(place: Place) {
-    const trip = trips[0];
-    if (!trip) return;
-    onAddTripItem({
-      tripId: trip.id,
-      dayIndex: 0,
-      type: "place",
-      placeId: place.id,
-      title: place.name,
-      category: place.category,
-      details: `${place.address || place.city}${place.review ? `・我的 ★${place.review.rating}` : ""}`,
-    });
-  }
 
   return (
     <div className="space-y-4">
@@ -48,13 +37,14 @@ export function MyPlacesPage({ places, trips, onReview, onAddTripItem }: MyPlace
 
       <div className="space-y-3">
         {Object.entries(groups).map(([city, cityGroups], index) => (
-          <CityAccordion key={city} city={city} groups={cityGroups} defaultOpen={index === 0} visited onAddToTrip={addToTrip} onReview={setReviewing} />
+          <CityAccordion key={city} city={city} groups={cityGroups} defaultOpen={index === 0} visited onAddToTrip={setAddingToTrip} onReview={setReviewing} onDelete={onDeletePlace} />
         ))}
       </div>
 
       {!places.length ? <p className="rounded-lg border border-border bg-card p-4 text-sm text-muted">評價後的地點會移到這裡。</p> : null}
 
       <ReviewSheet place={reviewing} open={Boolean(reviewing)} onClose={() => setReviewing(null)} onSubmit={onReview} />
+      <AddToTripSheet place={addingToTrip} trips={trips} open={Boolean(addingToTrip)} onClose={() => setAddingToTrip(null)} onAddTripItem={onAddTripItem} />
     </div>
   );
 }

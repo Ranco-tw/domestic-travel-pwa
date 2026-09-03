@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarPlus, ExternalLink, Pencil, Star } from "lucide-react";
+import { CalendarPlus, ExternalLink, Pencil, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { formatGoogleRating } from "@/lib/placeUtils";
 import { Place } from "@/lib/types";
@@ -10,9 +10,16 @@ interface PlaceCardProps {
   visited?: boolean;
   onAddToTrip: (place: Place) => void;
   onReview: (place: Place) => void;
+  onDelete: (placeId: string) => void;
 }
 
-export function PlaceCard({ place, visited = false, onAddToTrip, onReview }: PlaceCardProps) {
+export function PlaceCard({ place, visited = false, onAddToTrip, onReview, onDelete }: PlaceCardProps) {
+  function confirmDelete() {
+    if (window.confirm(`確定要刪除「${place.name}」嗎？`)) {
+      onDelete(place.id);
+    }
+  }
+
   return (
     <article className="overflow-hidden rounded-lg border border-border bg-card">
       <div className="p-3">
@@ -57,6 +64,10 @@ export function PlaceCard({ place, visited = false, onAddToTrip, onReview }: Pla
         <Button variant="secondary" className="flex-1 px-2 text-xs" onClick={() => onReview(place)}>
           <Pencil size={15} />
           {visited ? "編輯評價" : "評價"}
+        </Button>
+        <Button variant="danger" className="flex-1 px-2 text-xs" onClick={confirmDelete}>
+          <Trash2 size={15} />
+          刪除
         </Button>
       </div>
     </article>

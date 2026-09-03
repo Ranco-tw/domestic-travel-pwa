@@ -13,11 +13,12 @@ interface CityAccordionProps {
   visited?: boolean;
   onAddToTrip: (place: Place) => void;
   onReview: (place: Place) => void;
+  onDelete: (placeId: string) => void;
 }
 
 const categoryOrder: PlaceCategory[] = ["住宿", "食物", "景點", "交通", "其他"];
 
-export function CityAccordion({ city, groups, defaultOpen = false, visited = false, onAddToTrip, onReview }: CityAccordionProps) {
+export function CityAccordion({ city, groups, defaultOpen = false, visited = false, onAddToTrip, onReview, onDelete }: CityAccordionProps) {
   const [open, setOpen] = useState(defaultOpen);
   const total = Object.values(groups).reduce((sum, list) => sum + (list?.length ?? 0), 0);
 
@@ -41,7 +42,7 @@ export function CityAccordion({ city, groups, defaultOpen = false, visited = fal
                 <h3 className="mb-2 text-sm font-black text-muted">{category}</h3>
                 <div className="space-y-3">
                   {places.map((place) => (
-                    <PlaceCard key={place.id} place={place} visited={visited} onAddToTrip={onAddToTrip} onReview={onReview} />
+                    <PlaceCard key={place.id} place={place} visited={visited} onAddToTrip={onAddToTrip} onReview={onReview} onDelete={onDelete} />
                   ))}
                 </div>
               </div>

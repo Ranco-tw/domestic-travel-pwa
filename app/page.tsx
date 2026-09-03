@@ -87,6 +87,16 @@ export default function Home() {
     setTripItems((current) => current.filter((item) => item.id !== itemId));
   }
 
+  function removeTrip(tripId: string) {
+    setTrips((current) => current.filter((trip) => trip.id !== tripId));
+    setTripItems((current) => current.filter((item) => item.tripId !== tripId));
+  }
+
+  function removePlace(placeId: string) {
+    setPlaces((current) => current.filter((place) => place.id !== placeId));
+    setTripItems((current) => current.filter((item) => item.placeId !== placeId));
+  }
+
   function reorderTripItems(dayItems: TripItem[]) {
     setTripItems((current) => {
       const ids = new Set(dayItems.map((item) => item.id));
@@ -115,6 +125,7 @@ export default function Home() {
             trips={trips}
             onReview={reviewPlace}
             onAddTripItem={addTripItem}
+            onDeletePlace={removePlace}
           />
         ),
         itinerary: (
@@ -123,6 +134,7 @@ export default function Home() {
             trips={trips}
             tripItems={tripItems}
             onAddTrip={addTrip}
+            onRemoveTrip={removeTrip}
             onAddTripItem={addTripItem}
             onRemoveTripItem={removeTripItem}
             onReorderTripItems={reorderTripItems}
@@ -135,6 +147,7 @@ export default function Home() {
             trips={trips}
             onReview={reviewPlace}
             onAddTripItem={addTripItem}
+            onDeletePlace={removePlace}
           />
         ),
       }}

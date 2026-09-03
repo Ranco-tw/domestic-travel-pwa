@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -15,13 +15,14 @@ interface ItineraryPageProps {
   trips: Trip[];
   tripItems: TripItem[];
   onAddTrip: (trip: Omit<Trip, "id" | "userId" | "createdAt" | "updatedAt">) => void;
+  onRemoveTrip: (tripId: string) => void;
   onAddTripItem: (item: Omit<TripItem, "id" | "sortOrder">) => void;
   onRemoveTripItem: (itemId: string) => void;
   onReorderTripItems: (items: TripItem[]) => void;
   onReview: (placeId: string, review: PlaceReview) => void;
 }
 
-export function ItineraryPage({ placesById, trips, tripItems, onAddTrip, onAddTripItem, onRemoveTripItem, onReorderTripItems, onReview }: ItineraryPageProps) {
+export function ItineraryPage({ placesById, trips, tripItems, onAddTrip, onRemoveTrip, onAddTripItem, onRemoveTripItem, onReorderTripItems, onReview }: ItineraryPageProps) {
   const [selectedTripId, setSelectedTripId] = useState(trips[0]?.id ?? "");
   const [dayIndex, setDayIndex] = useState(0);
   const [tripOpen, setTripOpen] = useState(false);
@@ -34,6 +35,17 @@ export function ItineraryPage({ placesById, trips, tripItems, onAddTrip, onAddTr
     () => tripItems.filter((item) => item.tripId === trip?.id && item.dayIndex === dayIndex).sort((a, b) => a.sortOrder - b.sortOrder),
     [dayIndex, trip?.id, tripItems],
   );
+
+  useEffect(() => {
+    if (!trips.length) {
+      setSelectedTripId("");
+      return;
+    }
+    if (!trip || !trips.some((candidate) => candidate.id === selectedTripId)) {
+      setSelectedTripId(trips[0].id);
+    }
+    if (dayIndex > dayCount - 1) setDayIndex(0);
+  }, [dayCount, dayIndex, selectedTripId, trip, trips]);
 
   function onDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -61,10 +73,29 @@ export function ItineraryPage({ placesById, trips, tripItems, onAddTrip, onAddTr
               <option value={candidate.id} key={candidate.id}>{candidate.name}</option>
             ))}
           </select>
+          <div className="rounded-lg border border-border bg-card p-3">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-bold text-muted">行程日期</p>
+                <p className="mt-1 font-black">{trip.startDate} - {trip.endDate}</p>
+              </div>
+              <Button
+                variant="danger"
+                className="shrink-0 px-3"
+                onClick={() => {
+                  if (window.confirm(`確定要刪除「${trip.name}」和裡面的行程項目嗎？`)) onRemoveTrip(trip.id);
+                }}
+              >
+                刪除行程
+              </Button>
+            </div>
+            {trip.note ? <p className="mt-2 text-sm text-muted">{trip.note}</p> : null}
+          </div>
           <div className="hide-scrollbar flex gap-2 overflow-x-auto pb-1">
             {Array.from({ length: dayCount }).map((_, index) => (
               <button key={index} onClick={() => setDayIndex(index)} className={`min-h-10 min-w-20 rounded-lg border px-4 text-sm font-bold ${dayIndex === index ? "border-primary bg-primary text-white" : "border-border bg-card"}`}>
-                Day {index + 1}
+                <span className="block">Day {index + 1}</span>
+                <span className="block text-[11px] font-semibold opacity-80">{formatTripDay(trip.startDate, index)}</span>
               </button>
             ))}
           </div>
@@ -133,6 +164,12 @@ function SortableTripItem({ item, place, onRemove, onReview }: { item: TripItem;
       </div>
     </article>
   );
+}
+
+function formatTripDay(startDate: string, offset: number) {
+  const date = new Date(`${startDate}T00:00:00`);
+  date.setDate(date.getDate() + offset);
+  return `${date.getMonth() + 1}/${date.getDate()}`;
 }
 
 function TripSheet({ open, onClose, onAddTrip }: { open: boolean; onClose: () => void; onAddTrip: ItineraryPageProps["onAddTrip"] }) {

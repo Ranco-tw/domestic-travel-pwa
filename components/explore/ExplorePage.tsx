@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Sheet } from "@/components/ui/Sheet";
+import { taiwanCities } from "@/lib/placeUtils";
 import { PlaceDraft } from "@/lib/types";
 
 interface ExplorePageProps {
@@ -95,7 +96,13 @@ export function ExplorePage({ onAddPlace }: ExplorePageProps) {
               <option key={category}>{category}</option>
             ))}
           </select>
-          <input className="w-full rounded-lg border border-border bg-background p-3" placeholder="縣市" value={draft.city} onChange={(event) => setDraft({ ...draft, city: event.target.value })} />
+          <select className="w-full rounded-lg border border-border bg-background p-3" value={draft.city} onChange={(event) => setDraft({ ...draft, city: event.target.value })}>
+            {taiwanCities.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
           <input className="w-full rounded-lg border border-border bg-background p-3" placeholder="地址" value={draft.address} onChange={(event) => setDraft({ ...draft, address: event.target.value })} />
           <input className="w-full rounded-lg border border-border bg-background p-3" placeholder="Google Maps 網址" value={draft.googleMapsUrl} onChange={(event) => setDraft({ ...draft, googleMapsUrl: event.target.value })} />
           <input className="w-full rounded-lg border border-border bg-background p-3" placeholder="照片網址" value={draft.photoUrl} onChange={(event) => setDraft({ ...draft, photoUrl: event.target.value })} />
