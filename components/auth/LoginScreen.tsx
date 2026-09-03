@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
+const allowedUsers = [
+  { account: "liuweihong", password: "810810" },
+  { account: "linyouyu", password: "841113" },
+];
+
 interface LoginScreenProps {
   onLogin: () => void;
 }
@@ -13,6 +18,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setAccount(localStorage.getItem("travel-pwa-account") ?? "");
@@ -20,8 +26,14 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (remember) localStorage.setItem("travel-pwa-account", account);
+    const matched = allowedUsers.some((user) => user.account === account.trim() && user.password === password);
+    if (!matched) {
+      setError("帳號或密碼不正確");
+      return;
+    }
+    if (remember) localStorage.setItem("travel-pwa-account", account.trim());
     localStorage.setItem("travel-pwa-session", "true");
+    localStorage.setItem("travel-pwa-current-user", account.trim());
     onLogin();
   }
 
@@ -30,12 +42,9 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
       <div className="relative mx-auto flex min-h-screen max-w-md flex-col overflow-hidden bg-[url('/login-background.png')] bg-cover bg-center px-7 pb-8 pt-16">
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(247,243,234,0.04),rgba(247,243,234,0.18)_30%,rgba(247,243,234,0.58)_48%,rgba(247,243,234,0.42)_100%)]" />
         <div className="relative mt-[9vh] text-center">
-          <div className="mx-auto mb-7 grid h-[86px] w-[86px] place-items-center rounded-[24px] bg-card shadow-soft">
-            <div className="relative h-11 w-11 rounded-md bg-[#59683a] shadow-inner">
-              <div className="absolute left-2 top-[-9px] h-4 w-7 rounded-t-lg border-[3px] border-[#59683a] bg-transparent" />
-              <div className="absolute inset-y-0 left-[18px] w-[3px] bg-[#a87545]/70" />
-              <div className="absolute bottom-2 right-1 text-lg leading-none text-[#d97b55]">♥</div>
-            </div>
+          <div className="mx-auto mb-7 h-[86px] w-[86px] overflow-hidden rounded-[24px] bg-card shadow-soft">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/login-icon.png" alt="旅途收藏" className="h-full w-full object-cover" />
           </div>
           <h1 className="text-[40px] font-black leading-none tracking-normal text-[#2f261f]">旅途收藏</h1>
           <p className="mt-4 text-[15px] font-bold text-[#64594d]">收藏回憶，規劃屬於我們的旅程</p>
@@ -65,6 +74,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </label>
+          {error ? <p className="mt-3 text-sm font-bold text-red-700">{error}</p> : null}
           <label className="my-5 flex items-center gap-3 text-[15px] font-bold text-[#74695c]">
             <input checked={remember} onChange={(event) => setRemember(event.target.checked)} type="checkbox" />
             記住帳號密碼
