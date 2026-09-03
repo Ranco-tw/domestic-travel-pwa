@@ -3,14 +3,10 @@
 import { useEffect, useState } from "react";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-
-const allowedUsers = [
-  { account: "liuweihong", password: "810810" },
-  { account: "linyouyu", password: "841113" },
-];
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 interface LoginScreenProps {
-  onLogin: () => void;
+  onLogin: () => void | Promise<void>;
 }
 
 export function LoginScreen({ onLogin }: LoginScreenProps) {
@@ -19,22 +15,32 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [remember, setRemember] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setAccount(localStorage.getItem("travel-pwa-account") ?? "");
   }, []);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const matched = allowedUsers.some((user) => user.account === account.trim() && user.password === password);
-    if (!matched) {
+    setError("");
+    setIsSubmitting(true);
+
+    const normalizedAccount = account.trim();
+    const email = normalizedAccount.includes("@") ? normalizedAccount : `${normalizedAccount}@example.com`;
+    const supabase = createBrowserSupabaseClient();
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (signInError) {
       setError("帳號或密碼不正確");
+      setIsSubmitting(false);
       return;
     }
+
     if (remember) localStorage.setItem("travel-pwa-account", account.trim());
-    localStorage.setItem("travel-pwa-session", "true");
-    localStorage.setItem("travel-pwa-current-user", account.trim());
-    onLogin();
+    else localStorage.removeItem("travel-pwa-account");
+    await onLogin();
+    setIsSubmitting(false);
   }
 
   return (
@@ -79,8 +85,8 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
             <input checked={remember} onChange={(event) => setRemember(event.target.checked)} type="checkbox" />
             記住帳號密碼
           </label>
-          <Button className="h-[60px] w-full text-lg" type="submit">
-            開始規劃
+          <Button className="h-[60px] w-full text-lg" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "登入中..." : "開始規劃"}
           </Button>
         </form>
       </div>

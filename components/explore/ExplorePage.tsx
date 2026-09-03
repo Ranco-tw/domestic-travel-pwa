@@ -8,7 +8,7 @@ import { taiwanCities } from "@/lib/placeUtils";
 import { PlaceDraft } from "@/lib/types";
 
 interface ExplorePageProps {
-  onAddPlace: (draft: PlaceDraft) => void;
+  onAddPlace: (draft: PlaceDraft) => void | Promise<void>;
 }
 
 const emptyDraft: PlaceDraft = {
@@ -43,9 +43,9 @@ export function ExplorePage({ onAddPlace }: ExplorePageProps) {
     }
   }
 
-  function saveManual() {
+  async function saveManual() {
     if (!draft.name.trim()) return;
-    onAddPlace(draft);
+    await onAddPlace(draft);
     setDraft(emptyDraft);
     setUrl("");
     setManualOpen(false);
