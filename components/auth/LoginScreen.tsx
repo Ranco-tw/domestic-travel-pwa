@@ -20,81 +20,77 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!account || !password) return;
     if (remember) localStorage.setItem("travel-pwa-account", account);
-    localStorage.setItem("travel-pwa-session", "true");
-    onLogin();
-  }
-
-  function handleDemoLogin() {
-    localStorage.setItem("travel-pwa-account", "demo");
     localStorage.setItem("travel-pwa-session", "true");
     onLogin();
   }
 
   return (
     <main className="min-h-screen bg-background text-text">
-      <div className="relative mx-auto flex min-h-screen max-w-md flex-col justify-end overflow-hidden bg-[#efe3cc] px-5 pb-8 pt-16">
+      <div className="relative mx-auto flex min-h-screen max-w-md flex-col overflow-hidden bg-[#efe3cc] px-7 pb-8 pt-16">
         <div className="absolute inset-0">
-          <div className="absolute inset-x-0 top-0 h-[63%] bg-[linear-gradient(180deg,#f8efd9_0%,#e9eddc_31%,#cddfdc_52%,#edd2b1_100%)]" />
-          <div className="absolute left-[-20%] top-[18%] h-52 w-80 rounded-[55%] bg-[#9aa987]/55 blur-sm" />
-          <div className="absolute right-[-28%] top-[19%] h-56 w-96 rounded-[55%] bg-[#899f9c]/60 blur-sm" />
-          <div className="absolute left-[-8%] top-[35%] h-24 w-[120%] rounded-[50%] bg-[#b8cec8]/85" />
-          <div className="absolute left-[-15%] top-[41%] h-20 w-[130%] rounded-[50%] bg-[#cfddd2]/85" />
-          <div className="absolute right-12 top-[14%] h-24 w-10 rounded-t-full bg-[#f3f0e8] shadow-sm" />
-          <div className="absolute right-10 top-[12.5%] h-4 w-14 rounded-sm bg-[#a96243]" />
-          <div className="absolute bottom-0 left-[-18%] h-[32%] w-[135%] rounded-t-[50%] bg-[#d5b98a]" />
-          <div className="absolute bottom-0 left-[-10%] h-[24%] w-[120%] rounded-t-[50%] bg-[#8e9862]" />
-          <div className="absolute bottom-[8.5%] left-[15%] h-2 w-[76%] rounded-full bg-[#766d5f]" />
-          <div className="absolute bottom-[9.5%] left-[13%] h-9 w-[72%] rounded-t-2xl bg-[#ede8dc] shadow-md" />
-          <div className="absolute bottom-[10.8%] left-[15%] h-5 w-[25%] rounded-md bg-[#b6513d]" />
-          <div className="absolute bottom-[10.8%] left-[42%] h-5 w-[33%] rounded-md bg-[#d8d8d0]" />
-          <div className="absolute bottom-[10.8%] left-[77%] h-5 w-[8%] rounded-r-lg bg-[#32312d]" />
-          <div className="absolute left-[14%] top-[8%] text-2xl text-[#8c8b7d]">⌁</div>
-          <div className="absolute left-[26%] top-[12%] text-xl text-[#8c8b7d]">⌁</div>
+          <div className="absolute inset-x-0 top-0 h-[64%] bg-[linear-gradient(180deg,#fbf0dc_0%,#eff0df_25%,#bfd9d9_54%,#f2d6ad_100%)]" />
+          <div className="absolute left-[-24%] top-[17%] h-44 w-80 rounded-[50%] bg-[#98a886]/55 blur-[2px]" />
+          <div className="absolute right-[-26%] top-[19%] h-48 w-80 rounded-[50%] bg-[#879d98]/60 blur-[2px]" />
+          <div className="absolute left-[-16%] top-[33%] h-20 w-[132%] rounded-[50%] bg-[#bad1ce]/85" />
+          <div className="absolute left-[-14%] top-[38%] h-20 w-[128%] rounded-[50%] bg-[#d8e3d7]/85" />
+          <div className="absolute right-[18%] top-[13%] h-[92px] w-10 rounded-t-full bg-[#f4f0e7] shadow-sm" />
+          <div className="absolute right-[15.5%] top-[11.8%] h-4 w-14 rounded-sm bg-[#a86345]" />
+          <div className="absolute right-[21%] top-[15.5%] h-3 w-5 rounded-sm bg-[#7f9a9a]" />
+          <div className="absolute bottom-0 left-[-22%] h-[34%] w-[145%] rounded-t-[50%] bg-[#d8ba83]" />
+          <div className="absolute bottom-0 left-[-10%] h-[25%] w-[124%] rounded-t-[48%] bg-[#87945c]" />
+          <div className="absolute bottom-[8%] left-[12%] h-[3px] w-[78%] rounded-full bg-[#766e5e]" />
+          <div className="absolute bottom-[9%] left-[10%] h-10 w-[76%] rounded-t-2xl bg-[#eee9dc] shadow-md" />
+          <div className="absolute bottom-[10.2%] left-[13%] h-6 w-[28%] rounded-md bg-[#b6543f]" />
+          <div className="absolute bottom-[10.2%] left-[43%] h-6 w-[34%] rounded-md bg-[#d9d8cf]" />
+          <div className="absolute bottom-[10.2%] left-[79%] h-6 w-[8%] rounded-r-lg bg-[#32322e]" />
+          <div className="absolute left-[12%] top-[9%] text-2xl text-[#8c8b7d]">⌁</div>
+          <div className="absolute left-[25%] top-[12%] text-xl text-[#8c8b7d]">⌁</div>
         </div>
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(247,243,234,0.02),rgba(247,243,234,0.58)_43%,rgba(247,243,234,0.92)_67%,rgba(247,243,234,0.86))]" />
-        <div className="relative mb-9 text-center">
-          <div className="mx-auto mb-5 grid h-[88px] w-[88px] place-items-center rounded-3xl bg-card shadow-soft">
-            <span className="text-5xl">▣</span>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(247,243,234,0.03),rgba(247,243,234,0.28)_27%,rgba(247,243,234,0.82)_57%,rgba(247,243,234,0.74))]" />
+
+        <div className="relative mt-[9vh] text-center">
+          <div className="mx-auto mb-7 grid h-[86px] w-[86px] place-items-center rounded-[24px] bg-card shadow-soft">
+            <div className="relative h-11 w-11 rounded-md bg-[#59683a] shadow-inner">
+              <div className="absolute left-2 top-[-9px] h-4 w-7 rounded-t-lg border-[3px] border-[#59683a] bg-transparent" />
+              <div className="absolute inset-y-0 left-[18px] w-[3px] bg-[#a87545]/70" />
+              <div className="absolute bottom-2 right-1 text-lg leading-none text-[#d97b55]">♥</div>
+            </div>
           </div>
-          <h1 className="text-[42px] font-black leading-none tracking-normal">旅途收藏</h1>
-          <p className="mt-3 text-sm font-semibold text-muted">收藏回憶，規劃屬於我們的旅程</p>
+          <h1 className="text-[40px] font-black leading-none tracking-normal text-[#2f261f]">旅途收藏</h1>
+          <p className="mt-4 text-[15px] font-bold text-[#64594d]">收藏回憶，規劃屬於我們的旅程</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="relative mb-[29%] rounded-2xl border border-border bg-card/95 p-5 shadow-soft backdrop-blur">
-          <h2 className="mb-5 text-2xl font-bold">登入</h2>
-          <label className="mb-3 flex min-h-12 items-center gap-3 rounded-lg border border-border bg-white/50 px-3 dark:bg-black/10">
+        <form onSubmit={handleSubmit} className="relative mt-11 rounded-[18px] border border-[#e4d7c4] bg-[#fffdf8]/95 p-5 shadow-soft backdrop-blur">
+          <h2 className="mb-6 text-[28px] font-black text-[#2f261f]">登入</h2>
+          <label className="mb-4 flex min-h-[58px] items-center gap-3 rounded-lg border border-[#ddd2c4] bg-white/55 px-4">
             <User size={18} className="text-muted" />
             <input
               value={account}
               onChange={(event) => setAccount(event.target.value)}
-              className="w-full bg-transparent outline-none"
+              className="w-full bg-transparent text-[15px] outline-none placeholder:text-[#8b8277]"
               placeholder="帳號"
             />
           </label>
-          <label className="flex min-h-12 items-center gap-3 rounded-lg border border-border bg-white/50 px-3 dark:bg-black/10">
+          <label className="flex min-h-[58px] items-center gap-3 rounded-lg border border-[#ddd2c4] bg-white/55 px-4">
             <Lock size={18} className="text-muted" />
             <input
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               type={showPassword ? "text" : "password"}
-              className="w-full bg-transparent outline-none"
+              className="w-full bg-transparent text-[15px] outline-none placeholder:text-[#8b8277]"
               placeholder="密碼"
             />
             <button type="button" onClick={() => setShowPassword((value) => !value)} aria-label="顯示密碼">
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </label>
-          <label className="my-4 flex items-center gap-2 text-sm text-muted">
+          <label className="my-5 flex items-center gap-3 text-[15px] font-bold text-[#74695c]">
             <input checked={remember} onChange={(event) => setRemember(event.target.checked)} type="checkbox" />
             記住帳號密碼
           </label>
-          <Button className="w-full" type="submit">
+          <Button className="h-[60px] w-full text-lg" type="submit">
             開始規劃
-          </Button>
-          <Button className="mt-3 w-full border-dashed" type="button" variant="secondary" onClick={handleDemoLogin}>
-            使用測試帳號進入
           </Button>
         </form>
       </div>
