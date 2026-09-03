@@ -62,6 +62,9 @@ export interface PlaceDraft {
   city: string;
   address: string;
   googleMapsUrl: string;
+  googlePlaceId?: string;
+  googleRating?: number;
+  googleReviewCount?: number;
   note: string;
   photoUrl: string;
 }
