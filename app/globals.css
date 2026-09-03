@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 247 243 234;
+  --card: 255 253 248;
+  --primary: 111 125 77;
+  --accent: 199 121 74;
+  --text: 47 42 36;
+  --muted: 117 107 93;
+  --border: 227 216 200;
+  --star: 217 164 65;
+}
+
+[data-theme="dark"] {
+  --background: 23 26 22;
+  --card: 36 38 31;
+  --primary: 168 179 122;
+  --accent: 208 138 91;
+  --text: 244 239 228;
+  --muted: 185 174 158;
+  --border: 58 58 49;
+  --star: 226 184 91;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: rgb(var(--background));
+  color: rgb(var(--text));
+  font-family: Arial, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

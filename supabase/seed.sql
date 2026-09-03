@@ -1,0 +1,2 @@
+-- Optional sample rows should be inserted after creating a Supabase Auth user.
+-- Replace USER_UUID with the user's auth.users.id before running.
